@@ -1,7 +1,8 @@
-from django.shortcuts import render
-from .tasks import long_running_task
-from django.http import HttpResponse
+from celery import shared_task
+import time
 
-def ren(request):
-    long_running_task.delay()
-    return HttpResponse("Task has been started ...")
+@shared_task
+def long_running_task():
+    time.sleep(10) # naamlou task
+    print("Task completed!")  # print fil console log to verify
+    return "Task completed!"

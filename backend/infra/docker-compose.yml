@@ -18,21 +18,19 @@ services:
   redis:
     image: redis:7
     container_name: school_redis
-    ports:
-      - "6379:6379"
     networks:
       - school_network
 
   web:
     build:
-      context: ..               # Django project root (where manage.py is)
-      dockerfile: infra/Dockerfile  # Dockerfile inside infra folder
+      context: ../SchoolProject
+      dockerfile: ../infra/Dockerfile
     container_name: school_web
     command: >
       sh -c "python manage.py migrate &&
              python manage.py runserver 0.0.0.0:8000"
     volumes:
-      - ../:/code
+      - ../SchoolProject:/code
     ports:
       - "8000:8000"
     depends_on:
@@ -45,14 +43,14 @@ services:
 
   celery:
     build:
-      context: ..               # Django project root
-      dockerfile: infra/Dockerfile  # Dockerfile inside infra folder
+      context: ../SchoolProject
+      dockerfile: ../infra/Dockerfile
     container_name: school_celery
     command: celery -A SchoolProject worker -l info
     volumes:
-      - ../:/code
+      - ../SchoolProject:/code
     depends_on:
-      - web
+      - db
       - redis
     environment:
       - DJANGO_SETTINGS_MODULE=settings.dev
@@ -61,6 +59,7 @@ services:
 
 networks:
   school_network:
+    driver: bridge
 
 volumes:
   db_data:

@@ -6,19 +6,26 @@ ALLOWED_HOSTS = []
 
 # Dev database (SQLite = simple & fast)
 # PostgreSQL
+DEBUG = True
+ALLOWED_HOSTS = []
+
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
         "NAME": "schooldb",
         "USER": "schooluser",
         "PASSWORD": "schoolpass",
-        "HOST": "db",       # matches docker-compose service name
+        "HOST": "db",  # correct
         "PORT": 5432,
     }
 }
 
+
 CELERY_BROKER_URL = "redis://redis:6379/0"
 CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
 
 # Dev-only apps
 INSTALLED_APPS += [

@@ -3,5 +3,5 @@ from . import views
 
 
 urlpatterns = [
-    path('celerytest/', views.ren, name='ren')
+    path('celerytest/', views.long_running_task, name='ren')
 ]
