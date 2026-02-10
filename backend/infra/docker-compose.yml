@@ -1,0 +1,66 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15
+    container_name: school_db
+    environment:
+      POSTGRES_USER: schooluser
+      POSTGRES_PASSWORD: schoolpass
+      POSTGRES_DB: schooldb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - school_network
+
+  redis:
+    image: redis:7
+    container_name: school_redis
+    ports:
+      - "6379:6379"
+    networks:
+      - school_network
+
+  web:
+    build:
+      context: ..               # Django project root (where manage.py is)
+      dockerfile: infra/Dockerfile  # Dockerfile inside infra folder
+    container_name: school_web
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ../:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings.dev
+    networks:
+      - school_network
+
+  celery:
+    build:
+      context: ..               # Django project root
+      dockerfile: infra/Dockerfile  # Dockerfile inside infra folder
+    container_name: school_celery
+    command: celery -A SchoolProject worker -l info
+    volumes:
+      - ../:/code
+    depends_on:
+      - web
+      - redis
+    environment:
+      - DJANGO_SETTINGS_MODULE=settings.dev
+    networks:
+      - school_network
+
+networks:
+  school_network:
+
+volumes:
+  db_data:
