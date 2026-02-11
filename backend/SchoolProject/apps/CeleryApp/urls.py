@@ -1,7 +1,7 @@
-from django.urls import path, include
+from django.urls import path
 from . import views
 
 
 urlpatterns = [
-    path('celerytest/', views.long_running_task, name='ren')
+    path('celerytest/', views.start_task, name='ren')
 ]
