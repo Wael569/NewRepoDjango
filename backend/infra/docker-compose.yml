@@ -27,8 +27,8 @@ services:
       dockerfile: ../infra/Dockerfile
     container_name: school_web
     command: >
-      sh -c "python manage.py migrate &&
-             python manage.py runserver 0.0.0.0:8000"
+      sh -c "./infra/wait-for-db.sh db py manage.py migrate &&
+             py manage.py runserver 0.0.0.0:8000"
     volumes:
       - ../SchoolProject:/code
     ports:
@@ -38,6 +38,11 @@ services:
       - redis
     environment:
       - DJANGO_SETTINGS_MODULE=settings.dev
+      - POSTGRES_DB=schooldb
+      - POSTGRES_USER=schooluser
+      - POSTGRES_PASSWORD=schoolpass
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     networks:
       - school_network
 
@@ -46,7 +51,7 @@ services:
       context: ../SchoolProject
       dockerfile: ../infra/Dockerfile
     container_name: school_celery
-    command: celery -A SchoolProject worker -l info
+    command: sh -c "./infra/wait-for-db.sh db celery -A SchoolProject worker -l info"
     volumes:
       - ../SchoolProject:/code
     depends_on:
@@ -54,6 +59,11 @@ services:
       - redis
     environment:
       - DJANGO_SETTINGS_MODULE=settings.dev
+      - POSTGRES_DB=schooldb
+      - POSTGRES_USER=schooluser
+      - POSTGRES_PASSWORD=schoolpass
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
     networks:
       - school_network
 
