@@ -5,4 +5,6 @@ def get_Utilisateur():
         Utilisateur.objects.values("id", "name", "email", "age")
     )
 
-# njib all users from postgres
+# extract bch ykoun min fichier JSON (JSON source ) ...
+
+
